@@ -16,10 +16,13 @@
 package brooklyn.entity.container.docker;
 
 import java.util.List;
+import java.util.Map;
 
 import brooklyn.catalog.Catalog;
 import brooklyn.config.ConfigKey;
 import brooklyn.entity.Entity;
+import brooklyn.entity.annotation.Effector;
+import brooklyn.entity.annotation.EffectorParam;
 import brooklyn.entity.basic.ConfigKeys;
 import brooklyn.entity.basic.SoftwareProcess;
 import brooklyn.entity.group.DynamicCluster;
@@ -29,10 +32,12 @@ import brooklyn.entity.trait.HasShortName;
 import brooklyn.entity.trait.Resizable;
 import brooklyn.event.AttributeSensor;
 import brooklyn.event.basic.BasicAttributeSensorAndConfigKey;
+import brooklyn.event.basic.BasicConfigKey;
 import brooklyn.event.basic.PortAttributeSensorAndConfigKey;
 import brooklyn.event.basic.Sensors;
 import brooklyn.location.docker.DockerHostLocation;
 import brooklyn.location.dynamic.LocationOwner;
+import brooklyn.util.collections.MutableMap;
 import brooklyn.util.flags.SetFromFlag;
 
 /**
@@ -80,6 +85,8 @@ public interface DockerHost extends SoftwareProcess, Resizable, HasShortName, Lo
 
     AttributeSensor<String> HOST_NAME = Sensors.newStringSensor("docker.host.name", "The name of the Docker host");
 
+    DockerHostLocation getDockerHost();
+
     String getDockerHostName();
 
     DynamicCluster getDockerContainerCluster();
@@ -88,4 +95,8 @@ public interface DockerHost extends SoftwareProcess, Resizable, HasShortName, Lo
 
     DockerInfrastructure getInfrastructure();
 
+    @Effector(description="Create an SSH'able image")
+    void createSshableImage(
+            @EffectorParam(name="dockerFile", description="URI of file to copy, e.g. file://.., http://.., classpath://..") String dockerFile,
+            @EffectorParam(name="folder", description="Destination folder relative to runDir") String folder);
 }

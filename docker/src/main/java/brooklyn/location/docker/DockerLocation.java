@@ -24,6 +24,13 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Objects.ToStringHelper;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Sets;
+
 import brooklyn.entity.Entity;
 import brooklyn.entity.basic.Entities;
 import brooklyn.entity.container.docker.DockerHost;
@@ -39,16 +46,8 @@ import brooklyn.location.basic.Machines;
 import brooklyn.location.basic.SshMachineLocation;
 import brooklyn.location.cloud.AvailabilityZoneExtension;
 import brooklyn.location.dynamic.DynamicLocation;
-import brooklyn.util.collections.MutableMap;
 import brooklyn.util.flags.SetFromFlag;
 import brooklyn.util.guava.Maybe;
-
-import com.google.common.base.Objects.ToStringHelper;
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
 
 public class DockerLocation extends AbstractLocation implements DockerVirtualLocation,
         MachineProvisioningLocation<MachineLocation>,
@@ -124,7 +123,7 @@ public class DockerLocation extends AbstractLocation implements DockerVirtualLoc
             Entities.waitForServiceUp(dockerHost, dockerHost.getConfig(DockerHost.START_TIMEOUT), TimeUnit.SECONDS);
             // Obtain a new Docker container location, save and return it
             DockerHostLocation location = dockerHost.getDynamicLocation();
-            DockerContainerLocation container = location.obtain(MutableMap.of("imageId", "e26387043472295e639b3e2be465e6bf5c2026ee5a0e15e63d980ba9a2f45c1a"));
+            DockerContainerLocation container = location.obtain(flags);
             Maybe<SshMachineLocation> deployed = Machines.findUniqueSshMachineLocation(dockerHost.getLocations());
             if (deployed.isPresent()) {
                 if (LOG.isDebugEnabled()) {
