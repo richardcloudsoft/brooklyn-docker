@@ -30,6 +30,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.util.concurrent.Uninterruptibles;
 
 import brooklyn.entity.basic.AbstractSoftwareProcessSshDriver;
 import brooklyn.entity.basic.Entities;
@@ -64,7 +65,8 @@ public class DockerHostSshDriver extends AbstractSoftwareProcessSshDriver implem
 
     @Override
     public ProcessTaskWrapper<Integer> executeScriptAsync(String dockerfile, String name) {
-        String buildCommand = format("docker build -rm -t brooklyn/%s - < %s/%s/%s", name, getRunDir(), name, DOCKERFILE);
+        String buildCommand = sudo(format("docker build -rm -t brooklyn/%s - < %s/%s/%s", name, getRunDir(), name,
+                DOCKERFILE));
         DynamicTasks.queue(SshEffectorTasks.ssh(format("mkdir -p %s/%s", getRunDir(), name))
                                            .summary(format("creating folder `%s/%s`", getRunDir(), name))).block();
         copyResource(dockerfile, format("%s/%s", name, DOCKERFILE));
@@ -81,7 +83,7 @@ public class DockerHostSshDriver extends AbstractSoftwareProcessSshDriver implem
                 .body.append(sudo("service docker status"))
                 .failOnNonZeroResultCode()
                 .gatherOutput();
-
+        Uninterruptibles.sleepUninterruptibly(5, TimeUnit.SECONDS);
         return Repeater.create()
                 .repeat()
                 .every(1,SECONDS)
@@ -157,8 +159,10 @@ public class DockerHostSshDriver extends AbstractSoftwareProcessSshDriver implem
         String group = chainGroup(
                 INSTALL_WGET,
                 sudo(BashCommands.alternatives(sudo("rpm -qa | grep epel-release"),
-                                        sudo(format("rpm -Uvh http://download.fedoraproject.org/pub/epel/%s/%s/epel-release-%s.noarch.rpm",
-                                                osMajor, arch, epelRelease)))));
+                        sudo(format("rpm -Uvh http://download.fedoraproject.org/pub/epel/%s/%s/epel-release-%s.noarch.rpm",
+                                osMajor, arch, epelRelease))
+                ))
+        );
         return group;
     }
 
@@ -177,7 +181,7 @@ public class DockerHostSshDriver extends AbstractSoftwareProcessSshDriver implem
         List<String> commands = ImmutableList.<String> builder()
                 .add(sudo("service docker stop"))
                 .add(ifExecutableElse0("apt-get", format("echo 'DOCKER_OPTS=\"-H tcp://0.0.0.0:%s -H unix:///var/run/docker.sock\"' | sudo tee -a /etc/default/docker", getDockerPort())))
-                .add(ifExecutableElse0("yum", sudo(format("echo 'other_args=\"-H tcp://0.0.0.0:%s -H unix:///var/run/docker.sock\"' > /etc/sysconfig/docker", getDockerPort()))))
+                .add(ifExecutableElse0("yum", format("echo 'other_args=\"-H tcp://0.0.0.0:%s -H unix:///var/run/docker.sock\"' | sudo tee /etc/sysconfig/docker", getDockerPort())))
                 .build();
 
         newScript(CUSTOMIZING)
