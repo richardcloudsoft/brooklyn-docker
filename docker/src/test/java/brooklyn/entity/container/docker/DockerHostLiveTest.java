@@ -54,6 +54,8 @@ import brooklyn.test.entity.TestApplication;
  */
 public class DockerHostLiveTest {
 
+    public static final String USER = "root";
+    public static final String ADDRESS = "5.153.55.226";
     private BrooklynLauncher launcher;
     private ManagementContext managementContext;
     private SshMachineLocation machine;
@@ -68,8 +70,8 @@ public class DockerHostLiveTest {
                 .start();
         
         machine = managementContext.getLocationManager().createLocation(LocationSpec.create(SshMachineLocation.class)
-                .configure("user", "andrea")
-                .configure("address", "198.11.193.61"));
+                .configure("user", USER)
+                .configure("address", ADDRESS));
         machinePool = managementContext.getLocationManager().createLocation(LocationSpec.create(FixedListMachineProvisioningLocation.class)
                 .configure("machines", ImmutableList.of(machine)));
         

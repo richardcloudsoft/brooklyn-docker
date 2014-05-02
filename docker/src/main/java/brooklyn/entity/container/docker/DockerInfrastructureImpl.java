@@ -188,7 +188,6 @@ public class DockerInfrastructureImpl extends BasicStartableImpl implements Dock
         Location location = getManagementContext().getLocationRegistry().resolve(definition);
 
         setAttribute(DYNAMIC_LOCATION, location);
-        //setAttribute(LOCATION_NAME, location.getId());
         setAttribute(LOCATION_NAME, locationName);
         getManagementContext().getLocationRegistry().updateDefinedLocation(definition);
 

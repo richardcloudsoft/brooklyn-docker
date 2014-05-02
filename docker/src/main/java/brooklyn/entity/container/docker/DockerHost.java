@@ -16,7 +16,6 @@
 package brooklyn.entity.container.docker;
 
 import java.util.List;
-import java.util.Map;
 
 import brooklyn.catalog.Catalog;
 import brooklyn.config.ConfigKey;
@@ -32,12 +31,10 @@ import brooklyn.entity.trait.HasShortName;
 import brooklyn.entity.trait.Resizable;
 import brooklyn.event.AttributeSensor;
 import brooklyn.event.basic.BasicAttributeSensorAndConfigKey;
-import brooklyn.event.basic.BasicConfigKey;
 import brooklyn.event.basic.PortAttributeSensorAndConfigKey;
 import brooklyn.event.basic.Sensors;
 import brooklyn.location.docker.DockerHostLocation;
 import brooklyn.location.dynamic.LocationOwner;
-import brooklyn.util.collections.MutableMap;
 import brooklyn.util.flags.SetFromFlag;
 
 /**
