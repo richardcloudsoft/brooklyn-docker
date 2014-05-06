@@ -247,7 +247,8 @@ public class DockerHostImpl extends SoftwareProcessImpl implements DockerHost {
                 .put("jcloudsLocation", getManagementContext().getLocationRegistry().resolve(
                         format("jclouds:docker:http://%s:%s",
                                 found.get().getSshHostAndPort().getHostText(),
-                                this.getPort())))
+                                this.getPort())
+                ))
                 .build();
         host = createLocation(flags);
         log.info("New Docker host location {} created", host);

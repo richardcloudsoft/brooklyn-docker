@@ -106,7 +106,7 @@ public class DockerInfrastructureImpl extends BasicStartableImpl implements Dock
                 .displayName("Docker Applications"));
 
         if (Entities.isManaged(this)) {
-            Entities.manage(dockerHosts);
+            //Entities.manage(dockerHosts);
             Entities.manage(fabric);
             Entities.manage(buckets);
         }

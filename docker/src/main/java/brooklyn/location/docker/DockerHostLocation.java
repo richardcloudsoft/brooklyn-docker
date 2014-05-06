@@ -24,7 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Objects.ToStringHelper;
-import com.google.common.base.Optional;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -44,6 +44,7 @@ import brooklyn.location.basic.SshMachineLocation;
 import brooklyn.location.cloud.AvailabilityZoneExtension;
 import brooklyn.location.dynamic.DynamicLocation;
 import brooklyn.location.jclouds.JcloudsLocation;
+import brooklyn.location.jclouds.JcloudsLocationConfig;
 import brooklyn.util.collections.MutableMap;
 import brooklyn.util.flags.SetFromFlag;
 
@@ -101,14 +102,13 @@ public class DockerHostLocation extends AbstractLocation implements MachineLocat
         // increase size of Docker container cluster
         DynamicCluster cluster = dockerHost.getDockerContainerCluster();
 
-        Map map = MutableMap.of("imageNameRegex", "brooklyn/centos");
-        flags.putAll(map);
-
-        Optional<Entity> added = cluster.growByOne(jcloudsLocation, flags);
-        if (!added.isPresent()) {
-            throw new NoMachinesAvailableException(String.format("Failed to create containers. Limit reached at %s", dockerHost.getDockerHostName()));
+        jcloudsLocation.setConfig(JcloudsLocationConfig.IMAGE_NAME_REGEX, "brooklyn/centos");
+        int delta = 1;
+        Collection<Entity> added = cluster.resizeByDelta(delta);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Added {} Docker container: {}", delta, Iterables.toString(added));
         }
-        DockerContainer dockerContainer = (DockerContainer) added.get();
+        DockerContainer dockerContainer = (DockerContainer) Iterables.getOnlyElement(added);
         return dockerContainer.getDynamicLocation();
     }
 

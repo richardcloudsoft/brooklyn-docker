@@ -24,12 +24,6 @@ import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import brooklyn.entity.Entity;
-import brooklyn.entity.group.zoneaware.BalancingNodePlacementStrategy;
-import brooklyn.entity.trait.Identifiable;
-import brooklyn.location.Location;
-import brooklyn.location.docker.DockerHostLocation;
-
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
@@ -37,6 +31,12 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
+
+import brooklyn.entity.Entity;
+import brooklyn.entity.group.zoneaware.BalancingNodePlacementStrategy;
+import brooklyn.entity.trait.Identifiable;
+import brooklyn.location.Location;
+import brooklyn.location.docker.DockerHostLocation;
 
 /**
  * Placement strategy that adds more Docker hosts if existing locations run out of capacity.
@@ -81,7 +81,7 @@ public class DockerNodePlacementStrategy extends BalancingNodePlacementStrategy 
             // Grow the Docker host cluster; based on max number of Docker containers
             int maxSize = machine.getMaxSize();
             int delta = (remaining / maxSize) + (remaining % maxSize > 0 ? 1 : 0);
-            Collection<Entity> added = machine.getDockerInfrastructure().getDockerHostCluster().grow(delta);
+            Collection<Entity> added = machine.getDockerInfrastructure().getDockerHostCluster().resizeByDelta(delta);
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Added {} Docker hosts: {}", delta, Iterables.toString(Iterables.transform(added,
                         identity())));

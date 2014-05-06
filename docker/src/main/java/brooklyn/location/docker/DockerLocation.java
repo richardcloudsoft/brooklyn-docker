@@ -19,7 +19,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -120,7 +119,7 @@ public class DockerLocation extends AbstractLocation implements DockerVirtualLoc
             DockerHost dockerHost = machine.getOwner();
 
             // Now wait until the host has started up
-            Entities.waitForServiceUp(dockerHost, dockerHost.getConfig(DockerHost.START_TIMEOUT), TimeUnit.SECONDS);
+            Entities.waitForServiceUp(dockerHost);
             // Obtain a new Docker container location, save and return it
             DockerHostLocation location = dockerHost.getDynamicLocation();
             DockerContainerLocation container = location.obtain(flags);
